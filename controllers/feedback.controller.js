@@ -39,17 +39,15 @@ const postFeedbackUser = async (request, response, next) => {
 };
 
 const postFeedbackWorker = async (request, response, next) => {
-  const feed = request.body;
+  const worker = request.worker._id;
 
-  const client = request.client._id;
-
-  const feedback = feed.feedback;
+  const feedback = request.body.feedback;
   console.log("feedback: ", feedback);
 
-  const body = { feedback, user };
+  const body = { feedback, worker };
   console.log("body: ", body);
 
-  const reply = await feedbackService.postFeedbackUserService(body);
+  const reply = await feedbackService.postFeedbackWorkerService(body);
 
   const { error, myFeedback } = reply;
 
@@ -61,7 +59,22 @@ const postFeedbackWorker = async (request, response, next) => {
   response.json({ status: 200, myFeedback });
 };
 
-const getFeedbackAdmin = async (request, response, next) => {};
+const getFeedbackAdmin = async (request, response, next) => {
+  const reply = await feedbackService.getFeedbackAdminService();
+
+  const { error, feedbacks } = reply;
+
+  if (error) {
+    response.json({ error });
+    return next(error);
+  }
+
+  if (feedbacks.length === 0) {
+    return response.json({ status: 400, Message: "No Feedbacks listed" });
+  }
+
+  response.json({ status: 200, feedbacks });
+};
 
 module.exports = {
   postFeedbackVisitor,
