@@ -65,9 +65,15 @@ const signUpServices = async (body) => {
   const { email } = body;
   try {
     const isUser = await User.findOne({ email });
+    const isWorker = await Worker.findOne({ email });
 
     if (isUser) {
       const error = new HttpError(404, "User already exist");
+      console.log("error: ", error);
+      return { error };
+    }
+    if (isWorker) {
+      const error = new HttpError(404, "This email id already exist");
       console.log("error: ", error);
       return { error };
     }
@@ -179,9 +185,16 @@ const signUpworkerServices = async (body) => {
   const { email } = body;
   try {
     const isWorker = await Worker.findOne({ email });
+    const isUser = await User.findOne({ email });
 
     if (isWorker) {
       const error = new HttpError(404, "Worker already exist");
+      console.log("error: ", error);
+      return { error };
+    }
+
+    if (isUser) {
+      const error = new HttpError(404, "This email id already exist");
       console.log("error: ", error);
       return { error };
     }
