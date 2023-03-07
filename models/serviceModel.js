@@ -1,16 +1,31 @@
+// order placed by customer
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const serviceSchema = new Schema({
   user: {
     type: Schema.Types.ObjectId,
-    required: true,
     ref: "User",
   },
   // type of servcie [carpenter , painter , plumber]
   service: {
-    type: String,
-    required: true,
+    serviceName: {
+      type: String,
+    },
+    serviceImage: {
+      type: String,
+    },
+  },
+  launchedService: {
+    launchedServiceName: {
+      type: String,
+    },
+    launchedServiceImage: {
+      type: Array,
+    },
+    launchedServiceDescription: {
+      type: String,
+    },
   },
   // service request for from the services
   request: {

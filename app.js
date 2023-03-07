@@ -30,6 +30,7 @@ mongoose
 
 // import routes
 const userRoutes = require("./routes/user.routes");
+const placeServiceRoutes = require("./routes/service.routes");
 const workerRelatedRoutes = require("./routes/workerRelated.routes");
 const orderRoutes = require("./routes/order.routes");
 const feedbackRoutes = require("./routes/feedback.routes");
@@ -42,6 +43,7 @@ app.use(userRoutes);
 app.use(workerRelatedRoutes);
 app.use(orderRoutes);
 app.use(feedbackRoutes);
+app.use(placeServiceRoutes);
 
 const port = process.env.PORT;
 
