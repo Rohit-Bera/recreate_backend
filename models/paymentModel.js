@@ -8,6 +8,7 @@ const paymentSchema = new Schema(
       ref: "Order",
       required: true,
     },
+    // status - payment is pending or not
     paymentInfo: {
       type: String,
       required: true,
