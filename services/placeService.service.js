@@ -24,9 +24,11 @@ const searchbyServiceApi = async ({ searched }) => {
   try {
     const searchService = new RegExp(searched, "i");
 
-    const isFoundService = await Service.find({ searchService });
+    const isFoundService = await Service.find({
+      "service.serviceName": searchService,
+    });
 
-    const isFoundLaunchedService = await Service.find({
+    const isFoundLaunchedService = await Service.findOne({
       "launchedService.launchedServiceName": searchService,
     });
 
