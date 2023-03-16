@@ -34,50 +34,122 @@ const searchByService = async (request, response, next) => {
 
 // admin
 const placeService = async (request, response, next) => {
-  const url = request.protocol + "://" + request.get("host");
+  // const url = request.protocol + "://" + request.get("host");
 
-  // const url = "https://recreate-backend-server.onrender.com";
+  const url = "https://recreate-backend-server.onrender.com";
 
   const { serviceName, launchedServiceName, launchedServiceDescription } =
     request.body;
 
   const images = request.files;
 
-  const serviceImage =
-    url + "/serviceImage/" + request.files.serviceImage[0].filename;
+  if (request.files.launchedServiceImage && request.files.serviceImage) {
+    const serviceImage =
+      url + "/serviceImage/" + request.files.serviceImage[0].filename;
 
-  const launchedServiceImage = [];
+    const launchedServiceImage = [];
 
-  const li = request.files.launchedServiceImage;
+    const li = request.files.launchedServiceImage;
 
-  li.forEach((item) => {
-    launchedServiceImage.push(url + "/launchedServiceImage/" + item.filename);
-  });
+    li.forEach((item) => {
+      launchedServiceImage.push(url + "/launchedServiceImage/" + item.filename);
+    });
 
-  const service = {
-    serviceName,
-    serviceImage,
-  };
+    const service = {
+      serviceName,
+      serviceImage,
+    };
 
-  const launchedService = {
-    launchedServiceName,
-    launchedServiceImage,
-    launchedServiceDescription,
-  };
+    const launchedService = {
+      launchedServiceName,
+      launchedServiceImage,
+      launchedServiceDescription,
+    };
 
-  const reply = await placedService.placeServiceApi({
-    service,
-    launchedService,
-  });
+    const reply = await placedService.placeServiceApi({
+      service,
+      launchedService,
+    });
 
-  const { error, publishedService } = reply;
+    const { error, publishedService } = reply;
 
-  if (error) {
-    response.json({ error });
-    return next(error);
+    if (error) {
+      response.json({ error });
+      return next(error);
+    }
+
+    response.json({ status: 200, publishedService });
+  } else if (request.files.serviceImage) {
+    const serviceImage =
+      url + "/serviceImage/" + request.files.serviceImage[0].filename;
+
+    // const launchedServiceImage = [];
+
+    // const li = request.files.launchedServiceImage;
+
+    // li.forEach((item) => {
+    //   launchedServiceImage.push(url + "/launchedServiceImage/" + item.filename);
+    // });
+
+    const service = {
+      serviceName,
+      serviceImage,
+    };
+
+    // const launchedService = {
+    //   launchedServiceName,
+    //   launchedServiceImage,
+    //   launchedServiceDescription,
+    // };
+
+    const data = { service };
+
+    const reply = await placedService.placeServiceApi(data);
+
+    const { error, publishedService } = reply;
+
+    if (error) {
+      response.json({ error });
+      return next(error);
+    }
+
+    response.json({ status: 200, publishedService });
+  } else if (request.files.launchedServiceImage) {
+    // const serviceImage =
+    //   url + "/serviceImage/" + request.files.serviceImage[0].filename;
+
+    const launchedServiceImage = [];
+
+    const li = request.files.launchedServiceImage;
+
+    li.forEach((item) => {
+      launchedServiceImage.push(url + "/launchedServiceImage/" + item.filename);
+    });
+
+    // const service = {
+    //   serviceName,
+    //   serviceImage,
+    // };
+
+    const launchedService = {
+      launchedServiceName,
+      launchedServiceImage,
+      launchedServiceDescription,
+    };
+
+    const data = { launchedService };
+
+    const reply = await placedService.placeServiceApi(data);
+
+    const { error, publishedService } = reply;
+
+    if (error) {
+      response.json({ error });
+      return next(error);
+    }
+
+    response.json({ status: 200, publishedService });
   }
-
-  response.json({ status: 200, publishedService });
 };
 
 module.exports = {

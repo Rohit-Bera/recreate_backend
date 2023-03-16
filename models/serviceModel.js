@@ -34,7 +34,6 @@ const serviceSchema = new Schema({
   // accept or pending by worker
   serviceStatus: {
     type: String,
-    required: true,
     default: "pending",
   },
 });

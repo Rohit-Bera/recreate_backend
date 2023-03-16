@@ -47,28 +47,44 @@ const searchbyServiceApi = async ({ searched }) => {
   }
 };
 
-const placeServiceApi = async ({ service, launchedService }) => {
+const placeServiceApi = async (data) => {
+  const { service, launchedService } = data;
   console.log("launchedService: ", launchedService);
   console.log("service: ", service);
 
-  const { launchedServiceName } = launchedService;
-  console.log("launchedServiceName: ", launchedServiceName);
   try {
-    const serviceFound = await Service.findOne({
-      "launchedService.launchedServiceName": launchedServiceName,
-    });
+    if (launchedService) {
+      const { launchedServiceName } = launchedService;
+      console.log("launchedServiceName: ", launchedServiceName);
 
-    if (serviceFound) {
-      const error = new HttpError(404, "You cannot upload same service again!");
-      return { error };
+      const serviceFound = await Service.findOne({
+        "launchedService.launchedServiceName": launchedServiceName,
+      });
+
+      if (serviceFound) {
+        const error = new HttpError(
+          404,
+          "You cannot upload same service again!"
+        );
+        return { error };
+      }
     }
 
-    const newService = { service, launchedService };
+    if (service && launchedService) {
+      const newService = { service, launchedService };
 
-    const publishedService = new Service(newService);
-    await publishedService.save();
+      const publishedService = new Service(newService);
+      await publishedService.save();
 
-    return { publishedService };
+      return { publishedService };
+    } else if (launchedService) {
+      const newService = { launchedService };
+
+      const publishedService = new Service(newService);
+      await publishedService.save();
+
+      return { publishedService };
+    }
   } catch (e) {
     const error = new HttpError(500, `Internal server error : ${e}`);
 
