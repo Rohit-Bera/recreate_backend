@@ -37,6 +37,7 @@ const feedbackRoutes = require("./routes/feedback.routes");
 
 // access images
 app.use("/workerDocuments", express.static("uploads/workerDocuments"));
+app.use("/servicesList", express.static("uploads/servicesList"));
 
 // <---- Routes  ---->
 app.use(userRoutes);
