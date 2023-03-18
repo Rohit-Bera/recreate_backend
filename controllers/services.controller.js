@@ -45,14 +45,14 @@ const placeService = async (request, response, next) => {
 
   if (request.files.launchedServiceImage && request.files.serviceImage) {
     const serviceImage =
-      url + "/serviceImage/" + request.files.serviceImage[0].filename;
+      url + "/servicesList/" + request.files.serviceImage[0].filename;
 
     const launchedServiceImage = [];
 
     const li = request.files.launchedServiceImage;
 
     li.forEach((item) => {
-      launchedServiceImage.push(url + "/launchedServiceImage/" + item.filename);
+      launchedServiceImage.push(url + "/servicesList/" + item.filename);
     });
 
     const service = {
