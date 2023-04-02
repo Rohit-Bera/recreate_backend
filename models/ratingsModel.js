@@ -3,9 +3,14 @@ const { Schema } = mongoose;
 
 const Ratings = new Schema(
   {
-    order: {
+    service: {
       type: Schema.Types.ObjectId,
-      ref: "Order",
+      required: true,
+      ref: "Service",
+    },
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
       required: true,
     },
     rating: {

@@ -2,30 +2,30 @@
 const orderService = require("../services/order.service");
 
 // ---------------------------------- customer
-// service is placed
+// service order is placed
 const postOrderApi = async (request, response, next) => {
-  const _id = request.user._id;
-  console.log("user: ", _id);
+  const user = request.user;
 
-  const body = request.body;
-  console.log("body: ", body);
+  const data = request.body;
 
-  const result = await orderService.bookOrderServices({ _id, body });
+  data.bookedDate = new Date();
+  data.user = user._id;
+  data.orderStatus = "pending";
 
-  const { serviceBooked, error } = result;
+  const result = await orderService.bookOrderServices({ data });
+
+  const { newBookedService, error } = result;
 
   if (error) {
     response.json({ error });
-
     return next(error);
   }
 
-  response.json({ status: 200, serviceBooked });
+  response.json({ status: 200, newBookedService });
 };
 
 const getOrderedUserApi = async (request, response, next) => {
   const userId = request.user._id;
-  console.log("userId: ", userId);
 
   const result = await orderService.getOrderedServices(userId);
 
@@ -53,46 +53,65 @@ const cancelOrderApi = async (request, response, next) => {
     return next(error);
   }
 
-  response.json({ status: 200, canceled });
+  response.json({ status: 200, success: "Order was canceled!" });
+};
+
+const deleteOrderApi = async (request, response, next) => {
+  const _id = request.params.id;
+
+  const result = await orderService.deleteOrderServices({ _id });
+
+  const { deletedOrder, error } = result;
+
+  if (error) {
+    response.json({ error });
+    return next(error);
+  }
+
+  response.json({ status: 200, success: "Order was deleted" });
 };
 
 // --------------------------------  worker
 
 const getBookedOrderApi = async (request, response, next) => {
-  const worker = request.worker;
-
-  const result = await orderService.getBookedOrderServices(worker);
-  const { getOrders, error } = result;
+  const result = await orderService.getBookedOrderServices();
+  const { workerOrders, error } = result;
 
   if (error) {
     response.json({ error });
     return next(error);
   }
 
-  response.json({ status: 200, getOrders });
+  response.json({ status: 200, workerOrders });
 };
 
 const acceptOrderedApi = async (request, response, next) => {
-  const id = request.params.id;
+  const worker = request.worker._id;
 
-  const workerId = request.worker._id;
+  const serviceId = request.params.id;
 
-  const result = await orderService.acceptOrderedServices({ id, workerId });
+  const { visitDate } = request.body;
+  const result = await orderService.acceptOrderedServices({
+    worker,
+    visitDate,
+    serviceId,
+  });
 
-  const { error, acceptOrder, acceptedservice } = result;
+  const { error, acceptOrder } = result;
 
   if (error) {
     response.json({ error });
     return next(error);
   }
 
-  response.json({ status: 200, acceptOrder, acceptedservice });
+  response.json({ status: 200, success: "Order was accepted", acceptOrder });
 };
 
+// worker cancel order
 const cancelOrderedApi = async (request, response, next) => {
-  const id = request.params.id;
+  const _id = request.params.id;
 
-  const result = await orderService.cancelOrderedServices(id);
+  const result = await orderService.cancelOrderedServices({ _id });
 
   const { error, orderCanceled, cancelService } = result;
 
@@ -105,25 +124,7 @@ const cancelOrderedApi = async (request, response, next) => {
   response.json({ status: 200, orderCanceled, cancelService });
 };
 
-// admin
-
-const getServiceApi = async (request, response, next) => {
-  const reply = await orderService.getBookedServices();
-
-  const { services, error } = reply;
-
-  if (error) {
-    response.json({ error });
-
-    return next(error);
-  }
-
-  if (services.length === 0) {
-    return response.json({ status: 400, Message: "No Services Booked Yet!" });
-  }
-
-  response.json({ status: 200, services });
-};
+//----------------------------------- admin
 
 const getOrdersApi = async (request, response, next) => {
   const reply = await orderService.getOrdersServices();
@@ -146,9 +147,10 @@ module.exports = {
   postOrderApi,
   getOrderedUserApi,
   cancelOrderApi,
+  deleteOrderApi,
   getBookedOrderApi,
   acceptOrderedApi,
   cancelOrderedApi,
-  getServiceApi,
+
   getOrdersApi,
 };

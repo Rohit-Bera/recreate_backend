@@ -1,29 +1,56 @@
-const Service = require("../models/serviceModel");
 const Order = require("../models/orderModel");
 const HttpError = require("../middlewares/HttpError");
 
 // customer services
-const bookOrderServices = async ({ _id, body }) => {
+const bookOrderServices = async ({ data }) => {
+  console.log("data: ", data);
+
   try {
-    const { service, request } = body;
+    const { bookedDate, user, request, service, orderStatus } = data;
 
-    const user = _id;
+    if (request) {
+      const findReq = await Order.findOne({
+        user,
+        request,
+        orderStatus: "pending",
+      });
 
-    const data = { user, service, request };
+      if (findReq) {
+        console.log("error occured");
 
-    const serviceBooked = new Service(data);
-    await serviceBooked.save();
+        const error = new HttpError(
+          404,
+          "You have already booked this request"
+        );
 
-    if (!serviceBooked) {
-      const error = new HttpError(
-        404,
-        "Your service was not booked, Please try again after sometime"
-      );
-
-      return { error };
+        return { error };
+      }
     }
 
-    return { serviceBooked };
+    if (service) {
+      const findService = await Order.findOne({
+        user,
+        service,
+        orderStatus: "pending",
+      });
+      console.log("findService: ", findService);
+
+      if (findService) {
+        const error = new HttpError(
+          404,
+          "you have already same booked service!"
+        );
+
+        return { error };
+      }
+    }
+
+    const newBookedService = new Order(data);
+    await newBookedService.save();
+
+    // const newBookedService = "success!";
+
+    return { newBookedService };
   } catch (e) {
     const error = new HttpError(500, `Internal server error : ${e}`);
 
@@ -34,7 +61,7 @@ const bookOrderServices = async ({ _id, body }) => {
 const getOrderedServices = async (id) => {
   console.log("id: ", id);
   try {
-    const orders = await Service.find({ user: id });
+    const orders = await Order.find({ user: id });
     console.log("orders: ", orders);
 
     if (!orders) {
@@ -56,10 +83,19 @@ const getOrderedServices = async (id) => {
 
 const cancelOrderServices = async ({ _id }) => {
   try {
-    const canceled = await Service.findByIdAndDelete({ _id });
+    const data = {
+      orderStatus: "canceled",
+    };
+
+    const canceled = await Order.findByIdAndUpdate(
+      { _id },
+      { $set: data },
+      { new: true }
+    );
+    console.log("canceled: ", canceled);
 
     if (!canceled) {
-      const error = new HttpError(404, "Order was not found!");
+      const error = new HttpError(404, "Booked service was not found!");
 
       return { error };
     }
@@ -72,22 +108,17 @@ const cancelOrderServices = async ({ _id }) => {
   }
 };
 
-// client services
-const getBookedOrderServices = async (worker) => {
-  console.log("worker: ", worker);
-
-  const service = worker.profession;
-
+const deleteOrderServices = async ({ _id }) => {
   try {
-    const getOrders = await Service.find({ service });
+    const deletedOrder = await Order.findByIdAndDelete({ _id });
 
-    if (!getOrders) {
-      const error = new HttpError(404, `Orders were not found! , please check`);
+    if (!deletedOrder) {
+      const error = new HttpError(404, "order service was not found!");
 
       return { error };
     }
 
-    return { getOrders };
+    return { deletedOrder };
   } catch (e) {
     const error = new HttpError(500, `Internal server error : ${e}`);
 
@@ -95,43 +126,46 @@ const getBookedOrderServices = async (worker) => {
   }
 };
 
-const acceptOrderedServices = async ({ id, workerId }) => {
+// worker services
+const getBookedOrderServices = async () => {
   try {
-    const body = {
-      serviceStatus: "accepted",
+    const workerOrders = await Order.find();
+
+    if (!workerOrders) {
+      const error = new HttpError(404, "worker orders nto found");
+
+      return { error };
+    }
+
+    return { workerOrders };
+  } catch (e) {
+    const error = new HttpError(500, `Internal server error : ${e}`);
+
+    return { error };
+  }
+};
+
+const acceptOrderedServices = async ({ worker, visitDate, serviceId }) => {
+  try {
+    const data = {
+      worker,
+      visitDate: visitDate ? visitDate : new Date(),
+      orderStatus: "accepted",
     };
-    const acceptedservice = await Service.findByIdAndUpdate(
-      { _id: id },
-      { $set: body },
+
+    const acceptOrder = await Order.findByIdAndUpdate(
+      { _id: serviceId },
+      { $set: data },
       { new: true }
     );
-    console.log("acceptedservice: ", acceptedservice);
-
-    if (!acceptedservice) {
-      const error = new HttpError(404, `Service was cancelled!`);
-
-      return { error };
-    }
-    const { _id, user } = acceptedservice;
-    const service = _id;
-    const data = {
-      worker: workerId,
-      user,
-      service: _id,
-    };
-
-    console.log("data: ", data);
-
-    const acceptOrder = new Order(data);
-    await acceptOrder.save();
 
     if (!acceptOrder) {
-      const error = new HttpError(404, "order was not accepted");
+      const error = new HttpError(404, "order was not updated!");
 
       return { error };
     }
 
-    return { acceptOrder, acceptedservice };
+    return { acceptOrder };
   } catch (e) {
     const error = new HttpError(500, `Internal server error : ${e}`);
 
@@ -139,29 +173,9 @@ const acceptOrderedServices = async ({ id, workerId }) => {
   }
 };
 
-const cancelOrderedServices = async (id) => {
+// worker cancel order!
+const cancelOrderedServices = async ({ _id }) => {
   try {
-    const orderCanceled = await Order.findByIdAndDelete({ _id: id });
-    console.log("orderCanceled: ", orderCanceled);
-
-    if (!orderCanceled) {
-      const error = new HttpError(404, "order was not found!");
-
-      return { error };
-    }
-
-    const { service } = orderCanceled;
-
-    const body = {
-      serviceStatus: "pending",
-    };
-    const cancelService = await Service.findByIdAndUpdate(
-      { _id: service },
-      { $set: body },
-      { new: true }
-    );
-
-    return { orderCanceled, cancelService };
   } catch (e) {
     const error = new HttpError(500, `Internal server error : ${e}`);
 
@@ -170,23 +184,6 @@ const cancelOrderedServices = async (id) => {
 };
 
 // admin
-const getBookedServices = async () => {
-  try {
-    const services = await Service.find();
-
-    if (!services) {
-      const error = new HttpError(404, "User requests were not found!");
-
-      return { error };
-    }
-
-    return { services };
-  } catch (e) {
-    const error = new HttpError(500, `Internal server error : ${e}`);
-
-    return { error };
-  }
-};
 
 const getOrdersServices = async () => {
   try {
@@ -213,6 +210,6 @@ module.exports = {
   getBookedOrderServices,
   acceptOrderedServices,
   cancelOrderedServices,
-  getBookedServices,
   getOrdersServices,
+  deleteOrderServices,
 };

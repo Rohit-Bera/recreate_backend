@@ -18,12 +18,6 @@ const paymentSchema = new Schema(
       type: Number,
       required: true,
     },
-    // completed by worker or not [pending / done]
-    orderStatus: {
-      type: String,
-      required: true,
-      deafult: "pending",
-    },
   },
   { timestamps: true }
 );

@@ -13,7 +13,17 @@ const SysFeedbackSchema = new Schema(
     },
     feedback: {
       type: String,
-      required: true,
+    },
+    customerSupport: {
+      tokenId: {
+        type: mongoose.Types.ObjectId,
+      },
+      complaint: {
+        type: String,
+      },
+    },
+    complaintStatus: {
+      type: String,
     },
   },
   {

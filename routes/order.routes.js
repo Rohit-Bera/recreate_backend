@@ -11,14 +11,15 @@ const {
   getBookedOrderApi,
   acceptOrderedApi,
   cancelOrderedApi,
-  getServiceApi,
   getOrdersApi,
+  deleteOrderApi,
 } = require("../controllers/order.controlller");
 
 // customer
 router.post("/bookService", auth, postOrderApi);
 router.get("/getMyOrders", auth, getOrderedUserApi);
-router.delete("/cancelMyOrder/:id", auth, cancelOrderApi);
+router.put("/cancelMyOrder/:id", auth, cancelOrderApi);
+router.delete("/deleteMyOrder/:id", auth, deleteOrderApi);
 
 // worker
 router.get("/getUserOrders", workerauth, getBookedOrderApi);
@@ -26,7 +27,6 @@ router.put("/acceptOrder/:id", workerauth, acceptOrderedApi);
 router.put("/cancelOrderService/:id", workerauth, cancelOrderedApi);
 
 // admin
-router.get("/getServices", auth, adminauth, getServiceApi);
 router.get("/getOrders", auth, adminauth, getOrdersApi);
 
 module.exports = router;
