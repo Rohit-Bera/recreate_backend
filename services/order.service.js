@@ -61,7 +61,7 @@ const bookOrderServices = async ({ data }) => {
 const getOrderedServices = async (id) => {
   console.log("id: ", id);
   try {
-    const orders = await Order.find({ user: id });
+    const orders = await Order.find({ user: id }).populate("service");
     console.log("orders: ", orders);
 
     if (!orders) {
