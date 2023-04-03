@@ -61,7 +61,9 @@ const bookOrderServices = async ({ data }) => {
 const getOrderedServices = async (id) => {
   console.log("id: ", id);
   try {
-    const orders = await Order.find({ user: id }).populate("service");
+    const orders = await Order.find({ user: id })
+      .populate("service")
+      .populate("worker");
     console.log("orders: ", orders);
 
     if (!orders) {
@@ -129,7 +131,10 @@ const deleteOrderServices = async ({ _id }) => {
 // worker services
 const getBookedOrderServices = async () => {
   try {
-    const workerOrders = await Order.find();
+    const workerOrders = await Order.find()
+      .populate("user")
+      .populate("worker")
+      .populate("service");
 
     if (!workerOrders) {
       const error = new HttpError(404, "worker orders nto found");
