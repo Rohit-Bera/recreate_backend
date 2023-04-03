@@ -35,6 +35,11 @@ const OrderSchema = new Schema(
     request: {
       type: String,
     },
+    paymentStatus: {
+      type: String,
+      required: true,
+      default: "pending",
+    },
   },
   {
     timestamps: true,
