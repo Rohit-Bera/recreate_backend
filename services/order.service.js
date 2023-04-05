@@ -9,13 +9,19 @@ const bookOrderServices = async ({ data }) => {
     const { bookedDate, user, request, service, orderStatus } = data;
 
     if (request) {
-      const findReq = await Order.findOne({
+      const findReqPending = await Order.findOne({
         user,
         request,
         orderStatus: "pending",
       });
 
-      if (findReq) {
+      const findReqAccepted = await Order.findOne({
+        user,
+        request,
+        orderStatus: "accepted",
+      });
+
+      if (findReqPending || findReqAccepted) {
         console.log("error occured");
 
         const error = new HttpError(
