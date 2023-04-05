@@ -34,17 +34,22 @@ const bookOrderServices = async ({ data }) => {
     }
 
     if (service) {
-      const findService = await Order.findOne({
+      const findServicePending = await Order.findOne({
         user,
         service,
         orderStatus: "pending",
       });
-      console.log("findService: ", findService);
 
-      if (findService) {
+      const findServiceAccepted = await Order.findOne({
+        user,
+        service,
+        orderStatus: "pending",
+      });
+
+      if (findServicePending || findServiceAccepted) {
         const error = new HttpError(
           404,
-          "you have already same booked service!"
+          "you have already booked this service!"
         );
 
         return { error };
