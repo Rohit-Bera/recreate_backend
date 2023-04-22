@@ -85,6 +85,21 @@ const getBookedOrderApi = async (request, response, next) => {
   response.json({ status: 200, workerOrders });
 };
 
+const getWorkerOrderById = async (request, response, next) => {
+  const worker = request.worker._id;
+
+  const result = orderService.getWorkerOrderbyIdServices({ worker });
+
+  const { workerOrders, error } = result;
+
+  if (error) {
+    response.json({ error });
+    return next(error);
+  }
+
+  response.json({ status: 200, workerOrders });
+};
+
 const acceptOrderedApi = async (request, response, next) => {
   const worker = request.worker._id;
 
@@ -151,6 +166,6 @@ module.exports = {
   getBookedOrderApi,
   acceptOrderedApi,
   cancelOrderedApi,
-
+  getWorkerOrderById,
   getOrdersApi,
 };

@@ -161,6 +161,27 @@ const getBookedOrderServices = async () => {
   }
 };
 
+const getWorkerOrderbyIdServices = async ({ worker }) => {
+  try {
+    const workerOrders = await Order.find({ worker })
+      .populate("user")
+      .populate("worker")
+      .populate("service");
+
+    if (!workerOrders) {
+      const error = new HttpError(404, "worker orders nto found");
+
+      return { error };
+    }
+
+    return { workerOrders };
+  } catch (e) {
+    const error = new HttpError(500, `Internal server error : ${e}`);
+
+    return { error };
+  }
+};
+
 const acceptOrderedServices = async ({ worker, visitDate, serviceId }) => {
   try {
     const data = {
@@ -224,6 +245,7 @@ module.exports = {
   getOrderedServices,
   cancelOrderServices,
   getBookedOrderServices,
+  getWorkerOrderbyIdServices,
   acceptOrderedServices,
   cancelOrderedServices,
   getOrdersServices,

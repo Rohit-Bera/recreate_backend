@@ -33,7 +33,7 @@ router.put("/forgotPasswordUser", auth, forgotPassword);
 // routes for workers
 router.post("/signupWorker", signUpWorker);
 router.put("/editWorker/:id", editWorker);
-router.put("/editPasswordWorker/:id", auth, changeWorkerPass);
+router.put("/editPasswordWorker/:id", workerAuth, changeWorkerPass);
 router.put("/forgotPasswordWorker", workerAuth, forgotPasswordWorker);
 
 // routes  of admin

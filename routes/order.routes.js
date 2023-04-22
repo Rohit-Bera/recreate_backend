@@ -13,6 +13,7 @@ const {
   cancelOrderedApi,
   getOrdersApi,
   deleteOrderApi,
+  getWorkerOrderById,
 } = require("../controllers/order.controlller");
 
 // customer
@@ -23,6 +24,7 @@ router.delete("/deleteMyOrder/:id", auth, deleteOrderApi);
 
 // worker
 router.get("/getUserOrders", workerauth, getBookedOrderApi);
+router.get("/getWorkerOrderById", workerauth, getWorkerOrderById);
 router.put("/acceptOrder/:id", workerauth, acceptOrderedApi);
 router.put("/cancelOrderService/:id", workerauth, cancelOrderedApi);
 

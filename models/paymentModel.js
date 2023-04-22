@@ -18,6 +18,9 @@ const paymentSchema = new Schema(
       type: Number,
       required: true,
     },
+    modeOfPayment: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
