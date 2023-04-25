@@ -224,7 +224,7 @@ const cancelOrderedServices = async ({ _id }) => {
 
 const getOrdersServices = async () => {
   try {
-    const orders = await Order.find();
+    const orders = await Order.find().populate('worker').populate('user').populate('service');
 
     if (!orders) {
       const error = new HttpError(404, "Orders not found!");
