@@ -88,7 +88,7 @@ const getBookedOrderApi = async (request, response, next) => {
 const getWorkerOrderById = async (request, response, next) => {
   const worker = request.worker._id;
 
-  const result = orderService.getWorkerOrderbyIdServices({ worker });
+  const result = await orderService.getWorkerOrderbyIdServices({ worker });
 
   const { workerOrders, error } = result;
 
