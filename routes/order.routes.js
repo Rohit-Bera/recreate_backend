@@ -14,6 +14,7 @@ const {
   getOrdersApi,
   deleteOrderApi,
   getWorkerOrderById,
+  postWorkkDoneApi,
 } = require("../controllers/order.controlller");
 
 // customer
@@ -26,6 +27,7 @@ router.delete("/deleteMyOrder/:id", auth, deleteOrderApi);
 router.get("/getUserOrders", workerauth, getBookedOrderApi);
 router.get("/getWorkerOrderById", workerauth, getWorkerOrderById);
 router.put("/acceptOrder/:id", workerauth, acceptOrderedApi);
+router.put("/onWorkCompleted/:id", workerauth, postWorkkDoneApi);
 router.put("/cancelOrderService/:id", workerauth, cancelOrderedApi);
 
 // admin

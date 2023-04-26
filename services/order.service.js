@@ -210,6 +210,33 @@ const acceptOrderedServices = async ({ worker, visitDate, serviceId }) => {
   }
 };
 
+const workCompletedService = async ({ worker, orderStatus, serviceId }) => {
+  try {
+    const data = {
+      worker,
+      orderStatus: orderStatus,
+    };
+
+    const acceptOrder = await Order.findByIdAndUpdate(
+      { _id: serviceId },
+      { $set: data },
+      { new: true }
+    );
+
+    if (!acceptOrder) {
+      const error = new HttpError(404, "order was not updated!");
+
+      return { error };
+    }
+
+    return { acceptOrder };
+  } catch (e) {
+    const error = new HttpError(500, `Internal server error : ${e}`);
+
+    return [error];
+  }
+};
+
 // worker cancel order!
 const cancelOrderedServices = async ({ _id }) => {
   try {
@@ -224,7 +251,10 @@ const cancelOrderedServices = async ({ _id }) => {
 
 const getOrdersServices = async () => {
   try {
-    const orders = await Order.find().populate('worker').populate('user').populate('service');
+    const orders = await Order.find()
+      .populate("worker")
+      .populate("user")
+      .populate("service");
 
     if (!orders) {
       const error = new HttpError(404, "Orders not found!");
@@ -246,6 +276,7 @@ module.exports = {
   cancelOrderServices,
   getBookedOrderServices,
   getWorkerOrderbyIdServices,
+  workCompletedService,
   acceptOrderedServices,
   cancelOrderedServices,
   getOrdersServices,

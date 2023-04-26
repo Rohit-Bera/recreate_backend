@@ -122,6 +122,28 @@ const acceptOrderedApi = async (request, response, next) => {
   response.json({ status: 200, success: "Order was accepted", acceptOrder });
 };
 
+const postWorkkDoneApi = async (request, response, next) => {
+  const worker = request.worker._id;
+
+  const serviceId = request.params.id;
+
+  const { orderStatus } = request.body;
+  const result = await orderService.workCompletedService({
+    worker,
+    orderStatus,
+    serviceId,
+  });
+
+  const { error, acceptOrder } = result;
+
+  if (error) {
+    response.json({ error });
+    return next(error);
+  }
+
+  response.json({ status: 200, success: "Order was accepted", acceptOrder });
+};
+
 // worker cancel order
 const cancelOrderedApi = async (request, response, next) => {
   const _id = request.params.id;
@@ -168,4 +190,5 @@ module.exports = {
   cancelOrderedApi,
   getWorkerOrderById,
   getOrdersApi,
+  postWorkkDoneApi,
 };
