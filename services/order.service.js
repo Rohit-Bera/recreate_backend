@@ -145,7 +145,8 @@ const getBookedOrderServices = async () => {
     const workerOrders = await Order.find()
       .populate("user")
       .populate("worker")
-      .populate("service");
+      .populate("service")
+      .sort({ bookedDate: 1 });
 
     if (!workerOrders) {
       const error = new HttpError(404, "worker orders nto found");
@@ -166,7 +167,8 @@ const getWorkerOrderbyIdServices = async ({ worker }) => {
     const workerOrders = await Order.find({ worker })
       .populate("user")
       .populate("worker")
-      .populate("service");
+      .populate("service")
+      .sort({ visitDate: 1 });
 
     if (!workerOrders) {
       const error = new HttpError(404, "worker orders nto found");
