@@ -87,7 +87,8 @@ const getOrderedServices = async (id) => {
   try {
     const orders = await Order.find({ user: id })
       .populate("service")
-      .populate("worker");
+      .populate("worker")
+      .sort({ bookedDate: 1 });
     console.log("orders: ", orders);
 
     if (!orders) {
