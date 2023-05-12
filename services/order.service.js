@@ -283,6 +283,7 @@ const workerVerifyOtpServices = async ({ userid, orderid, otp }) => {
     }
 
     const data = {
+      visitDate: new Date(),
       orderStatus: "progress",
     };
 
