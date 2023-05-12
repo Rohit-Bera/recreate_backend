@@ -9,7 +9,6 @@ const postOrderApi = async (request, response, next) => {
   const data = request.body;
 
   data.user = user._id;
-  data.bookedDate = new Date();
   data.orderStatus = "pending";
 
   const result = await orderService.bookOrderServices({ data });
