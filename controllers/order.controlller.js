@@ -8,8 +8,8 @@ const postOrderApi = async (request, response, next) => {
 
   const data = request.body;
 
-  data.bookedDate = new Date();
   data.user = user._id;
+  data.bookedDate = new Date();
   data.orderStatus = "pending";
 
   const result = await orderService.bookOrderServices({ data });
@@ -37,6 +37,22 @@ const getOrderedUserApi = async (request, response, next) => {
   }
 
   response.json({ status: 200, orders });
+};
+
+//get all otps
+const getOtpUserApi = async (request, response, next) => {
+  const userId = request.user._id;
+
+  const result = await orderService.getotpForOrderedServices(userId);
+
+  const { allOtps, error } = result;
+
+  if (error) {
+    response.json({ error });
+    return next(error);
+  }
+
+  response.json({ status: 200, allOtps });
 };
 
 // add-chrge
@@ -144,6 +160,25 @@ const postWorkkDoneApi = async (request, response, next) => {
   response.json({ status: 200, success: "Order was accepted", acceptOrder });
 };
 
+const workerVerifyOtpApi = async (request, response, next) => {
+  const { userid, orderid, otp } = request.body;
+
+  const result = await orderService.workerVerifyOtpServices({
+    userid,
+    orderid,
+    otp,
+  });
+
+  const { verified, error } = result;
+
+  if (error) {
+    response.json({ error });
+    return next(error);
+  }
+
+  response.json({ status: 200, verified });
+};
+
 // worker cancel order
 const cancelOrderedApi = async (request, response, next) => {
   const _id = request.params.id;
@@ -191,4 +226,6 @@ module.exports = {
   getWorkerOrderById,
   getOrdersApi,
   postWorkkDoneApi,
+  getOtpUserApi,
+  workerVerifyOtpApi,
 };

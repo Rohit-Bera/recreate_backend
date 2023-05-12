@@ -1,12 +1,13 @@
 const Order = require("../models/orderModel");
 const HttpError = require("../middlewares/HttpError");
+const Otpverify = require("../models/otpVerificationModel");
 
 // customer services
 const bookOrderServices = async ({ data }) => {
   console.log("data: ", data);
 
   try {
-    const { bookedDate, user, request, service, orderStatus } = data;
+    const { user, request, service, orderStatus } = data;
 
     if (request) {
       const findReqPending = await Order.findOne({
@@ -59,7 +60,19 @@ const bookOrderServices = async ({ data }) => {
     const newBookedService = new Order(data);
     await newBookedService.save();
 
-    // const newBookedService = "success!";
+    const minm = 100000;
+    const maxm = 999999;
+    const num = Math.floor(Math.random() * (maxm - minm + 1)) + minm;
+    console.log("num: ", num);
+
+    const otpData = {
+      userid: user,
+      orderid: newBookedService._id,
+      otp: num,
+    };
+
+    const otp = new Otpverify(otpData);
+    await otp.save();
 
     return { newBookedService };
   } catch (e) {
@@ -87,6 +100,26 @@ const getOrderedServices = async (id) => {
     }
 
     return { orders };
+  } catch (e) {
+    const error = new HttpError(500, `Internal server error : ${e}`);
+
+    return { error };
+  }
+};
+
+const getotpForOrderedServices = async (id) => {
+  console.log("id: ", id);
+  try {
+    const allOtps = await Otpverify.find({ userid: id });
+    console.log("allOtps: ", allOtps);
+
+    if (!allOtps) {
+      const error = new HttpError(404, "no orders added yet placed yet!");
+
+      return { error };
+    }
+
+    return { allOtps };
   } catch (e) {
     const error = new HttpError(500, `Internal server error : ${e}`);
 
@@ -239,6 +272,50 @@ const workCompletedService = async ({ worker, orderStatus, serviceId }) => {
   }
 };
 
+const workerVerifyOtpServices = async ({ userid, orderid, otp }) => {
+  try {
+    const verifyOtp = await Otpverify.findOne({ userid, orderid, otp });
+
+    if (!verifyOtp) {
+      const error = new HttpError(404, "please add correct otp!");
+
+      return { error };
+    }
+
+    const data = {
+      orderStatus: "progress",
+    };
+
+    const startOrder = await Order.findByIdAndUpdate(
+      { _id: orderid },
+      { $set: data },
+      { new: true }
+    );
+
+    if (!startOrder) {
+      const error = new HttpError(404, "order was not found!");
+
+      return { error };
+    }
+
+    if (startOrder) {
+      const _id = verifyOtp._id;
+      const deleteOtp = await Otpverify.findByIdAndDelete({ _id });
+
+      console.log("deleteOtp: ", deleteOtp);
+      console.log("otp deleted successfully!");
+    }
+
+    const verified = "OTP was verified , Start work!";
+
+    return { verified };
+  } catch (e) {
+    const error = new HttpError(500, `Internal server error : ${e}`);
+
+    return { error };
+  }
+};
+
 // worker cancel order!
 const cancelOrderedServices = async ({ _id }) => {
   try {
@@ -283,4 +360,6 @@ module.exports = {
   cancelOrderedServices,
   getOrdersServices,
   deleteOrderServices,
+  getotpForOrderedServices,
+  workerVerifyOtpServices,
 };
