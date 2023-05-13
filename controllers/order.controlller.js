@@ -54,23 +54,6 @@ const getOtpUserApi = async (request, response, next) => {
   response.json({ status: 200, allOtps });
 };
 
-// add-chrge
-const cancelOrderApi = async (request, response, next) => {
-  const _id = request.params.id;
-
-  const result = await orderService.cancelOrderServices({ _id });
-
-  const { canceled, error } = result;
-
-  if (error) {
-    response.json({ error });
-
-    return next(error);
-  }
-
-  response.json({ status: 200, success: "Order was canceled!" });
-};
-
 const deleteOrderApi = async (request, response, next) => {
   const _id = request.params.id;
 
@@ -178,23 +161,6 @@ const workerVerifyOtpApi = async (request, response, next) => {
   response.json({ status: 200, verified });
 };
 
-// worker cancel order
-const cancelOrderedApi = async (request, response, next) => {
-  const _id = request.params.id;
-
-  const result = await orderService.cancelOrderedServices({ _id });
-
-  const { error, orderCanceled, cancelService } = result;
-
-  if (error) {
-    response.json({ error });
-
-    return next(error);
-  }
-
-  response.json({ status: 200, orderCanceled, cancelService });
-};
-
 //----------------------------------- admin
 
 const getOrdersApi = async (request, response, next) => {
@@ -217,11 +183,9 @@ const getOrdersApi = async (request, response, next) => {
 module.exports = {
   postOrderApi,
   getOrderedUserApi,
-  cancelOrderApi,
   deleteOrderApi,
   getBookedOrderApi,
   acceptOrderedApi,
-  cancelOrderedApi,
   getWorkerOrderById,
   getOrdersApi,
   postWorkkDoneApi,

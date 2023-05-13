@@ -7,10 +7,8 @@ const workerauth = require("../middlewares/workerAuth");
 const {
   postOrderApi,
   getOrderedUserApi,
-  cancelOrderApi,
   getBookedOrderApi,
   acceptOrderedApi,
-  cancelOrderedApi,
   getOrdersApi,
   deleteOrderApi,
   getWorkerOrderById,
@@ -22,7 +20,6 @@ const {
 // customer
 router.post("/bookService", auth, postOrderApi);
 router.get("/getMyOrders", auth, getOrderedUserApi);
-router.put("/cancelMyOrder/:id", auth, cancelOrderApi);
 router.delete("/deleteMyOrder/:id", auth, deleteOrderApi);
 
 router.get("/getOtpUser", auth, getOtpUserApi);
@@ -32,7 +29,6 @@ router.get("/getUserOrders", workerauth, getBookedOrderApi);
 router.get("/getWorkerOrderById", workerauth, getWorkerOrderById);
 router.put("/acceptOrder/:id", workerauth, acceptOrderedApi);
 router.put("/onWorkCompleted/:id", workerauth, postWorkkDoneApi);
-router.put("/cancelOrderService/:id", workerauth, cancelOrderedApi);
 
 router.put("/verifyOtp", workerauth, workerVerifyOtpApi);
 

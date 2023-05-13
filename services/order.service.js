@@ -128,33 +128,6 @@ const getotpForOrderedServices = async (id) => {
   }
 };
 
-const cancelOrderServices = async ({ _id }) => {
-  try {
-    const data = {
-      orderStatus: "canceled",
-    };
-
-    const canceled = await Order.findByIdAndUpdate(
-      { _id },
-      { $set: data },
-      { new: true }
-    );
-    console.log("canceled: ", canceled);
-
-    if (!canceled) {
-      const error = new HttpError(404, "Booked service was not found!");
-
-      return { error };
-    }
-
-    return { canceled };
-  } catch (e) {
-    const error = new HttpError(500, `Internal server error : ${e}`);
-
-    return { error };
-  }
-};
-
 const deleteOrderServices = async ({ _id }) => {
   try {
     const deletedOrder = await Order.findByIdAndDelete({ _id });
@@ -163,6 +136,25 @@ const deleteOrderServices = async ({ _id }) => {
       const error = new HttpError(404, "order service was not found!");
 
       return { error };
+    }
+
+    const { _id, user } = deletedOrder;
+
+    const userid = user;
+    const orderid = _id;
+
+    const verifyOtp = await Otpverify.findOne({ userid, orderid });
+
+    if (!verifyOtp) {
+      const error = new HttpError(404, "please add correct otp!");
+
+      return { error };
+    } else {
+      const _id = verifyOtp._id;
+      const deleteOtp = await Otpverify.findByIdAndDelete({ _id });
+
+      console.log("deleteOtp: ", deleteOtp);
+      console.log("otp deleted successfully!");
     }
 
     return { deletedOrder };
@@ -318,16 +310,6 @@ const workerVerifyOtpServices = async ({ userid, orderid, otp }) => {
   }
 };
 
-// worker cancel order!
-const cancelOrderedServices = async ({ _id }) => {
-  try {
-  } catch (e) {
-    const error = new HttpError(500, `Internal server error : ${e}`);
-
-    return { error };
-  }
-};
-
 // admin
 
 const getOrdersServices = async () => {
@@ -354,12 +336,10 @@ const getOrdersServices = async () => {
 module.exports = {
   bookOrderServices,
   getOrderedServices,
-  cancelOrderServices,
   getBookedOrderServices,
   getWorkerOrderbyIdServices,
   workCompletedService,
   acceptOrderedServices,
-  cancelOrderedServices,
   getOrdersServices,
   deleteOrderServices,
   getotpForOrderedServices,
