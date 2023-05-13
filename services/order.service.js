@@ -129,8 +129,10 @@ const getotpForOrderedServices = async (id) => {
 };
 
 const deleteOrderServices = async ({ _id }) => {
+  console.log("_id: ", _id);
   try {
-    const deletedOrder = await Order.findByIdAndDelete({ _id });
+    const deletedOrder = await Order.findById({ _id });
+    console.log("deletedOrder: ", deletedOrder);
 
     if (!deletedOrder) {
       const error = new HttpError(404, "order service was not found!");
@@ -138,26 +140,32 @@ const deleteOrderServices = async ({ _id }) => {
       return { error };
     }
 
-    const { _id, user } = deletedOrder;
-
-    const userid = user;
-    const orderid = _id;
+    const userid = deletedOrder.user;
+    console.log("userid: ", userid);
+    const orderid = deletedOrder._id;
+    console.log("orderid: ", orderid);
 
     const verifyOtp = await Otpverify.findOne({ userid, orderid });
+    console.log("verifyOtp: ", verifyOtp);
 
     if (!verifyOtp) {
       const error = new HttpError(404, "please add correct otp!");
 
       return { error };
     } else {
-      const _id = verifyOtp._id;
-      const deleteOtp = await Otpverify.findByIdAndDelete({ _id });
+      console.log("verifyOtp._id: ", verifyOtp._id);
+
+      const deleteOtp = await Otpverify.findByIdAndDelete({
+        _id: verifyOtp._id,
+      });
 
       console.log("deleteOtp: ", deleteOtp);
       console.log("otp deleted successfully!");
     }
 
-    return { deletedOrder };
+    const deleteMyOrder = await Order.findByIdAndDelete({ _id });
+
+    return { deleteMyOrder };
   } catch (e) {
     const error = new HttpError(500, `Internal server error : ${e}`);
 

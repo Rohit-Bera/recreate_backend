@@ -59,7 +59,7 @@ const deleteOrderApi = async (request, response, next) => {
 
   const result = await orderService.deleteOrderServices({ _id });
 
-  const { deletedOrder, error } = result;
+  const { deleteMyOrder, error } = result;
 
   if (error) {
     response.json({ error });
