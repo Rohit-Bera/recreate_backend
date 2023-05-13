@@ -165,6 +165,33 @@ const deleteOrderServices = async ({ _id }) => {
   }
 };
 
+const cancelOrderService = async ({ _id, bookedDate }) => {
+  try {
+    const data = {
+      bookedDate,
+      visitDate: null,
+    };
+
+    const acceptOrder = await Order.findByIdAndUpdate(
+      { _id: _id },
+      { $set: data },
+      { new: true }
+    );
+
+    if (!acceptOrder) {
+      const error = new HttpError(404, "order was not updated!");
+
+      return { error };
+    }
+
+    return { acceptOrder };
+  } catch (e) {
+    const error = new HttpError(500, `Internal server error : ${e}`);
+
+    return [error];
+  }
+};
+
 // worker services
 const getBookedOrderServices = async () => {
   try {
@@ -342,6 +369,7 @@ module.exports = {
   acceptOrderedServices,
   getOrdersServices,
   deleteOrderServices,
+  cancelOrderService,
   getotpForOrderedServices,
   workerVerifyOtpServices,
 };

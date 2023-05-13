@@ -69,6 +69,21 @@ const deleteOrderApi = async (request, response, next) => {
   response.json({ status: 200, success: "Order was deleted" });
 };
 
+const cancelOrderApi = async (request, response, next) => {
+  const { _id, bookedDate } = request.body;
+
+  const result = await orderService.cancelOrderService({ _id, bookedDate });
+
+  const { error, acceptOrder } = result;
+
+  if (error) {
+    response.json({ error });
+    return next(error);
+  }
+
+  response.json({ status: 200, success: "Order was canceled!" });
+};
+
 // --------------------------------  worker
 
 const getBookedOrderApi = async (request, response, next) => {
@@ -191,4 +206,5 @@ module.exports = {
   postWorkkDoneApi,
   getOtpUserApi,
   workerVerifyOtpApi,
+  cancelOrderApi,
 };

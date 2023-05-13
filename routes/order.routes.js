@@ -15,13 +15,14 @@ const {
   postWorkkDoneApi,
   getOtpUserApi,
   workerVerifyOtpApi,
+  cancelOrderApi,
 } = require("../controllers/order.controlller");
 
 // customer
 router.post("/bookService", auth, postOrderApi);
 router.get("/getMyOrders", auth, getOrderedUserApi);
 router.delete("/deleteMyOrder/:id", auth, deleteOrderApi);
-
+router.put("/cancelOrder", auth, cancelOrderApi);
 router.get("/getOtpUser", auth, getOtpUserApi);
 
 // worker
