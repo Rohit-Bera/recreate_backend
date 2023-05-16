@@ -25,7 +25,7 @@ const askForPaymentService = async ({
       paymentStatus: "asked for payment",
     };
 
-    const updatePaidOrder = Order.findByIdAndUpdate(
+    const updatePaidOrder = await Order.findByIdAndUpdate(
       { _id: orderId },
       { $set: orderData },
       { new: true }
