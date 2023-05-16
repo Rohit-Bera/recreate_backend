@@ -42,6 +42,40 @@ const getAllPaymentsWorker = async (request, response, next) => {
   response.json({ status: 200, allPayments });
 };
 
+const getBalanceWallet = async (request, response, next) => {
+  const _id = request.worker._id;
+
+  const result = await paymentService.getBalanceWalletService({ _id });
+
+  const { error, myBalance } = result;
+
+  if (error) {
+    response.json({ error });
+
+    return next(error);
+  }
+
+  response.json({ status: 200, myBalance });
+};
+
+const withdrawFromWallet = async (request, response, next) => {
+  const _id = request.worker._id;
+  console.log("_id: ", _id);
+
+  const { withdrawlAmt } = request.body;
+
+  const result = await paymentService.withdrawFromWallet({ _id, withdrawlAmt });
+
+  const { error, success } = result;
+
+  if (error) {
+    response.json({ error });
+    return next(error);
+  }
+
+  response.json({ statsu: 200, success });
+};
+
 // user
 const payAmount = async (request, response, next) => {
   const userId = request.user._id;
@@ -86,4 +120,6 @@ module.exports = {
   getAllPaymentsWorker,
   payAmount,
   getAllPaymentsUser,
+  getBalanceWallet,
+  withdrawFromWallet,
 };

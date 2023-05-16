@@ -9,12 +9,17 @@ const {
   getAllPaymentsWorker,
   payAmount,
   getAllPaymentsUser,
+  getBalanceWallet,
+  withdrawFromWallet,
 } = require("../controllers/payment.controller");
 
 // worker
 // id -> orderId
 router.post("/askForPayment/:id", workerauth, askForPayment);
 router.get("/getAllPaymentWorker", workerauth, getAllPaymentsWorker);
+// worker wallet
+router.get("/getBalance", workerauth, getBalanceWallet);
+router.put("/withdrawAmount", workerauth, withdrawFromWallet);
 
 // user
 // id -> paymentId

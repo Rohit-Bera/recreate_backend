@@ -2,6 +2,7 @@ const HttpError = require("../middlewares/HttpError");
 const Order = require("../models/orderModel");
 const Payment = require("../models/paymentModel");
 const Commision = require("../models/commisionModel");
+const Wallet = require("../models/walletModel");
 
 // worker
 const askForPaymentService = async ({
@@ -70,6 +71,60 @@ const getPaymentsWorkerService = async ({ workerId }) => {
   }
 };
 
+const getBalanceWalletService = async ({ _id }) => {
+  try {
+    const myBalance = await Wallet.findOne({ worker: _id });
+
+    if (!myBalance) {
+      const error = new HttpError(500, `Wallet was not found!`);
+
+      return { error };
+    }
+
+    return { myBalance };
+  } catch (e) {
+    const error = new HttpError(500, `Internal server error : ${e}`);
+
+    return { error };
+  }
+};
+
+const withdrawFromWallet = async ({ _id, withdrawlAmt }) => {
+  try {
+    const myWallet = await Wallet.findOne({ worker: _id });
+    console.log("myWallet: ", myWallet);
+
+    if (!myWallet) {
+      const error = new HttpError(500, `Wallet was not found!`);
+
+      return { error };
+    }
+
+    const totalAmount = myWallet.TotalBalance - withdrawlAmt;
+
+    const store = myWallet.transaction;
+    const item = { type: "withdraw", date: new Date(), amount: withdrawlAmt };
+    store.push(item);
+
+    const walletData = {
+      TotalBalance: totalAmount,
+      transaction: store,
+    };
+
+    const newTransaction = await Wallet.findByIdAndUpdate(
+      { _id: myWallet._id },
+      { $set: walletData },
+      { new: true }
+    );
+
+    return { success: "Amount Withdrawn successfull!" };
+  } catch (e) {
+    const error = new HttpError(500, `Internal server error : ${e}`);
+
+    return { error };
+  }
+};
+
 // user
 const payAmountService = async ({ userId, _id, paymentInfo }) => {
   try {
@@ -85,7 +140,7 @@ const payAmountService = async ({ userId, _id, paymentInfo }) => {
     const { order, serviceCost } = findPayment;
     console.log("order consoled: ", order);
 
-    // update order
+    // ----------------- update order
     if (order) {
       const orderData = {
         paymentStatus: "paid",
@@ -97,8 +152,9 @@ const payAmountService = async ({ userId, _id, paymentInfo }) => {
         { new: true }
       );
     }
+    // -----------------
 
-    // commission
+    // ----------------- commission
     const percent = serviceCost * 0.1;
     const finalAmount = serviceCost - percent;
     console.log("finalAmount: ", finalAmount);
@@ -126,8 +182,46 @@ const payAmountService = async ({ userId, _id, paymentInfo }) => {
         { new: true }
       );
     }
+    // -----------------
 
-    // update payment
+    // ----------------- wallet
+    if (order) {
+      const findWallet = await Wallet.findOne({ worker: order.worker });
+      console.log("findWallet: ", findWallet);
+
+      if (!findWallet) {
+        const walletData = {
+          worker: order.worker,
+          TotalBalance: finalAmount,
+          transaction: [
+            { type: "deposit", date: new Date(), amount: finalAmount },
+          ],
+        };
+
+        const newTransaction = new Wallet(walletData);
+        await newTransaction.save();
+      } else {
+        const totalAmount = findWallet.TotalBalance + finalAmount;
+
+        const store = findWallet.transaction;
+        const item = { type: "deposit", date: new Date(), amount: finalAmount };
+        store.push(item);
+
+        const walletData = {
+          TotalBalance: totalAmount,
+          transaction: store,
+        };
+
+        const newTransaction = await Wallet.findByIdAndUpdate(
+          { _id: findWallet._id },
+          { $set: walletData },
+          { new: true }
+        );
+      }
+    }
+    // -----------------
+
+    // ----------------- update payment
     const paymentData = {
       paymentInfo,
       commision: percent,
@@ -138,6 +232,7 @@ const payAmountService = async ({ userId, _id, paymentInfo }) => {
       { $set: paymentData },
       { new: true }
     );
+    // -----------------
 
     return { success: "payment was made successfull!" };
   } catch (e) {
@@ -170,4 +265,6 @@ module.exports = {
   getPaymentsWorkerService,
   payAmountService,
   getPaymentsUserService,
+  getBalanceWalletService,
+  withdrawFromWallet,
 };
