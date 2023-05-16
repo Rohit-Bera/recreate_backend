@@ -21,6 +21,16 @@ const askForPaymentService = async ({
       return { error };
     }
 
+    const orderData = {
+      paymentStatus: "asked for payment",
+    };
+
+    const updatePaidOrder = Order.findByIdAndUpdate(
+      { _id: orderId },
+      { $set: orderData },
+      { new: true }
+    );
+
     const paymentData = {
       order: orderId,
       worker: workerId,
