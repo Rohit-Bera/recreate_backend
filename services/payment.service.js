@@ -244,7 +244,7 @@ const payAmountService = async ({ userId, _id, paymentInfo }) => {
 
 const getPaymentsUserService = async ({ userId }) => {
   try {
-    const allPayments = await Payment.find({ user: userId });
+    const allPayments = await Payment.find({ user: userId }).populate("order");
 
     if (!allPayments) {
       const error = new HttpError(404, ` no payments found! `);
