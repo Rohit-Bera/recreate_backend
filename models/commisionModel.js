@@ -5,16 +5,14 @@ const commisionSchema = new Schema({
   order: {
     type: Schema.Types.ObjectId,
     ref: "Order",
-    required: true,
   },
   commision: {
     type: Number,
-    required: true,
   },
   // worker has paid or not
   commisionStatus: {
-    type: Boolean,
-    default: false,
+    type: String,
+    default: "pending",
   },
 });
 

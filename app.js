@@ -34,6 +34,7 @@ const placeServiceRoutes = require("./routes/service.routes");
 const workerRelatedRoutes = require("./routes/workerRelated.routes");
 const orderRoutes = require("./routes/order.routes");
 const feedbackRoutes = require("./routes/feedback.routes");
+const paymentRoutes = require("./routes/payment.routes");
 
 // access images
 app.use("/workerDocuments", express.static("uploads/workerDocuments"));
@@ -45,6 +46,7 @@ app.use(workerRelatedRoutes);
 app.use(orderRoutes);
 app.use(feedbackRoutes);
 app.use(placeServiceRoutes);
+app.use(paymentRoutes);
 
 const port = process.env.PORT;
 

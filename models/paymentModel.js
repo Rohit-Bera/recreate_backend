@@ -6,7 +6,14 @@ const paymentSchema = new Schema(
     order: {
       type: Schema.Types.ObjectId,
       ref: "Order",
-      required: true,
+    },
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
+    worker: {
+      type: Schema.Types.ObjectId,
+      ref: "Worker",
     },
     // status - payment is pending or not
     paymentInfo: {
@@ -18,8 +25,11 @@ const paymentSchema = new Schema(
       type: Number,
       required: true,
     },
-    modeOfPayment: {
-      type: String,
+    commision: {
+      type: Number,
+    },
+    finalCost: {
+      type: Number,
     },
   },
   { timestamps: true }
