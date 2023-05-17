@@ -22,6 +22,9 @@ router.get("/getAllPaymentWorker", workerauth, getAllPaymentsWorker);
 router.get("/getBalance", workerauth, getBalanceWallet);
 router.put("/withdrawAmount", workerauth, withdrawFromWallet);
 
+// stripe payment gateway
+router.post("/walletIntentWorker", workerauth, createPaymentIntent);
+
 // user
 // id -> paymentId
 router.put("/payAmount/:id", auth, payAmount);
