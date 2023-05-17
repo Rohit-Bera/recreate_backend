@@ -11,6 +11,7 @@ const {
   getAllPaymentsUser,
   getBalanceWallet,
   withdrawFromWallet,
+  createPaymentIntent,
 } = require("../controllers/payment.controller");
 
 // worker
@@ -25,5 +26,8 @@ router.put("/withdrawAmount", workerauth, withdrawFromWallet);
 // id -> paymentId
 router.put("/payAmount/:id", auth, payAmount);
 router.get("/getAllPaymentUser", auth, getAllPaymentsUser);
+
+// stripe payment gateway
+router.post("/paymentIntent", auth, createPaymentIntent);
 
 module.exports = router;
