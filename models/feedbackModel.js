@@ -1,28 +1,26 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-const SysFeedbackSchema = new Schema(
+const feedbackSchema = new Schema(
   {
     user: {
       type: Schema.Types.ObjectId,
       ref: "User",
     },
-    worker: {
+    client: {
       type: Schema.Types.ObjectId,
-      ref: "Worker",
+      ref: "Client",
     },
     feedback: {
       type: String,
     },
-    customerSupport: {
-      tokenId: {
-        type: mongoose.Types.ObjectId,
-      },
-      complaint: {
-        type: String,
-      },
+    complaint: {
+      type: String,
     },
     complaintStatus: {
+      type: String,
+    },
+    admin: {
       type: String,
     },
   },
@@ -31,5 +29,5 @@ const SysFeedbackSchema = new Schema(
   }
 );
 
-const SysFeedback = mongoose.model("Systemfeedback", SysFeedbackSchema);
-module.exports = SysFeedback;
+const Feedback = mongoose.model("Feedback", feedbackSchema);
+module.exports = Feedback;
