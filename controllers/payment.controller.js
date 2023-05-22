@@ -9,7 +9,7 @@ const askForPayment = async (request, response, next) => {
 
   const orderId = request.params.id;
 
-  const { serviceCost, paymentInfo, userId } = request.body;
+  const { serviceCost, paymentInfo, userId, serviceId } = request.body;
 
   const result = await paymentService.askForPaymentService({
     workerId,
@@ -17,6 +17,7 @@ const askForPayment = async (request, response, next) => {
     userId,
     serviceCost,
     paymentInfo,
+    serviceId,
   });
 
   const { newPayment, error } = result;

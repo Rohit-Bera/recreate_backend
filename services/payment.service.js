@@ -3,6 +3,7 @@ const Order = require("../models/orderModel");
 const Payment = require("../models/paymentModel");
 const Commision = require("../models/commisionModel");
 const Wallet = require("../models/walletModel");
+const Service = require("../models/serviceModel");
 
 // worker
 const askForPaymentService = async ({
@@ -11,6 +12,7 @@ const askForPaymentService = async ({
   userId,
   serviceCost,
   paymentInfo,
+  serviceId,
 }) => {
   try {
     const ifDonePayment = await Payment.findOne({ order: orderId });
@@ -31,31 +33,60 @@ const askForPaymentService = async ({
       { new: true }
     );
 
-    const paymentData = {
-      order: orderId,
-      worker: workerId,
-      user: userId,
-      serviceCost,
-      paymentInfo,
-    };
-
-    const newPayment = new Payment(paymentData);
-    await newPayment.save();
-
-    if (newPayment) {
-      const percent = serviceCost * 0.1;
-
-      const commiData = {
+    // service
+    if (serviceId) {
+      const paymentData = {
         order: orderId,
-        commision: percent,
-        commisionStatus: "pending",
+        worker: workerId,
+        user: userId,
+        service: serviceId,
+        serviceCost,
+        paymentInfo,
       };
+      const newPayment = new Payment(paymentData);
+      await newPayment.save();
 
-      const newCommision = new Commision(commiData);
-      await newCommision.save();
+      if (newPayment) {
+        const percent = serviceCost * 0.1;
+
+        const commiData = {
+          order: orderId,
+          commision: percent,
+          commisionStatus: "pending",
+        };
+
+        const newCommision = new Commision(commiData);
+        await newCommision.save();
+      }
+
+      return { newPayment };
+    } else {
+      //request
+      const paymentData = {
+        order: orderId,
+        worker: workerId,
+        user: userId,
+        serviceCost,
+        paymentInfo,
+      };
+      const newPayment = new Payment(paymentData);
+      await newPayment.save();
+
+      if (newPayment) {
+        const percent = serviceCost * 0.1;
+
+        const commiData = {
+          order: orderId,
+          commision: percent,
+          commisionStatus: "pending",
+        };
+
+        const newCommision = new Commision(commiData);
+        await newCommision.save();
+      }
+
+      return { newPayment };
     }
-
-    return { newPayment };
   } catch (e) {
     const error = new HttpError(500, `Internal server error : ${e}`);
 
@@ -254,7 +285,9 @@ const payAmountService = async ({ userId, _id, paymentInfo }) => {
 
 const getPaymentsUserService = async ({ userId }) => {
   try {
-    const allPayments = await Payment.find({ user: userId }).populate("order");
+    const allPayments = await Payment.find({ user: userId })
+      .populate("order")
+      .populate("service");
 
     if (!allPayments) {
       const error = new HttpError(404, ` no payments found! `);

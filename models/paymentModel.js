@@ -7,6 +7,10 @@ const paymentSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Order",
     },
+    service: {
+      type: Schema.Types.ObjectId,
+      ref: "Service",
+    },
     user: {
       type: Schema.Types.ObjectId,
       ref: "User",
